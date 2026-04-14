@@ -45,19 +45,23 @@ def extract_plate(bgr: np.ndarray) -> tuple:
     processed = preprocess(bgr)
     pil_img = Image.fromarray(processed)
 
-    # Tesseract config optimized for license plates
-    config = r'--oem 3 --psm 8 -c tessedit_char_whitelist=ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
-    text = pytesseract.image_to_string(pil_img, config=config).strip().upper()
+    # Try alphanumeric only first (numbers + latin letters on Ethiopian plates)
+    config_alpha = r'--oem 3 --psm 8 -c tessedit_char_whitelist=ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
+    text = pytesseract.image_to_string(pil_img, config=config_alpha).strip().upper()
 
-    # Clean up — remove spaces and special chars
     import re
     text = re.sub(r'[^A-Z0-9]', '', text)
+
+    # If nothing found, try without whitelist (catches mixed scripts)
+    if not text:
+        config_free = r'--oem 3 --psm 8'
+        text = pytesseract.image_to_string(pil_img, config=config_free).strip()
+        text = re.sub(r'\s+', '', text)
 
     if not text:
         return "", 0.0
 
-    # Get confidence from data
-    data = pytesseract.image_to_data(pil_img, config=config, output_type=pytesseract.Output.DICT)
+    data = pytesseract.image_to_data(pil_img, config=config_alpha, output_type=pytesseract.Output.DICT)
     confidences = [int(c) for c in data['conf'] if str(c).isdigit() and int(c) > 0]
     confidence = (sum(confidences) / len(confidences) / 100.0) if confidences else 0.5
 

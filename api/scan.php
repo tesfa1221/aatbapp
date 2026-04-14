@@ -17,6 +17,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['images'])) {
     curl_setopt($ch, CURLOPT_POST, 1);
     curl_setopt($ch, CURLOPT_POSTFIELDS, $post_fields);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_TIMEOUT, 60);        // wait up to 60s for Render wake-up
+    curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 30); // connection timeout
 
     $result = curl_exec($ch);
     if (curl_errno($ch)) {
@@ -46,7 +48,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['images'])) {
         $checkStmt->execute([$plate]);
         $isRegistered = $checkStmt->fetchColumn() > 0;
 
-        if ($confidence < 0.80) {
+        if ($confidence < 0.40) {  // Lowered from 0.80 — Tesseract scores lower than EasyOCR
             // Low confidence rejection
             $stmt = $pdo->prepare("INSERT INTO attendance (plate_number, status, reason) VALUES (?, 'rejected', 'Low confidence')");
             $stmt->execute([$plate]);
