@@ -2,10 +2,6 @@ services:
   - type: web
     name: aatb-ai-service
     runtime: python
-    pythonVersion: "3.11.9"
-    buildCommand: pip install -r api/requirements.txt
+    buildCommand: bash build.sh
     startCommand: uvicorn api.ai_service:app --host 0.0.0.0 --port $PORT
     plan: free
-    envVars:
-      - key: PORT
-        value: 10000
