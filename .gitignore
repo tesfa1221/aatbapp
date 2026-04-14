@@ -1,0 +1,20 @@
+# Android build
+app/build/
+build/
+.gradle/
+local.properties
+*.iml
+.idea/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+.env
+
+# EasyOCR models (large, downloaded at runtime)
+.EasyOCR/
+
+# OS
+.DS_Store
+Thumbs.db

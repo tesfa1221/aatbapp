@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: aatb-ai-service
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: python api/ai_service.py
+    plan: free
+    envVars:
+      - key: PORT
+        value: 8000
