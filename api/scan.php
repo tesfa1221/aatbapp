@@ -12,7 +12,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['images'])) {
     }
 
     // Forward to Python AI Service (set AI_SERVICE_URL in cPanel env vars)
-    $ai_url = getenv('AI_SERVICE_URL') ?: 'http://localhost:8000/analyze';
+    $ai_url = getenv('AI_SERVICE_URL') ?: 'https://aatbapp.onrender.com/analyze';
     $ch = curl_init($ai_url);
     curl_setopt($ch, CURLOPT_POST, 1);
     curl_setopt($ch, CURLOPT_POSTFIELDS, $post_fields);
